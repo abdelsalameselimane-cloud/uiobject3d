@@ -93,6 +93,31 @@ pre{padding:14px;overflow:auto;font:13px/1.65 ui-monospace,Consolas,monospace;co
 .q button.good{border-color:var(--ok);background:#3fb95022}
 .q button.bad{border-color:#f85149;background:#f8514922}
 .score{font-weight:700;color:var(--ok)}
+.tg{flex-wrap:wrap}
+.tg button{min-width:90px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.vs{grid-template-columns:1fr}}
+.vs .card{text-align:center}
+.vs .card svg.big{width:100%;max-width:200px;height:auto;margin:0 auto 8px;display:block}
+.vs h4{margin-bottom:6px}.vs p{color:var(--mut);font-size:14px;text-align:start}
+.vs .good{border-color:#4c9aff88;background:linear-gradient(180deg,#4c9aff14,var(--panel))}
+.gloss{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:860px){.gloss{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.gloss{grid-template-columns:1fr}}
+.gl{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+.gl b{display:block;color:var(--acc);margin-bottom:4px}
+.gl span{color:var(--mut);font-size:14px}
+.btn{margin-top:14px;background:linear-gradient(135deg,var(--acc),var(--acc2));border:0;color:#fff;padding:10px 18px;border-radius:10px;cursor:pointer;font:600 14px inherit;font-family:inherit}
+.math{background:#0a0e14;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0;font:13px ui-monospace,Consolas,monospace;direction:ltr;text-align:left;color:#9ad98b;overflow:auto}
+.exp{display:grid;grid-template-columns:260px 1fr;gap:18px;align-items:center}
+@media(max-width:700px){.exp{grid-template-columns:1fr}}
+.exp svg{width:100%;height:auto;background:#0a0e14;border:1px solid var(--line);border-radius:14px}
+.exp ul{padding-inline-start:18px;color:var(--mut);font-size:14px}.exp li{margin:6px 0}
+table.cmp td:first-child{font:inherit;font-weight:600;color:var(--txt);direction:inherit;text-align:start;white-space:normal}
+table.cmp th:last-child,table.cmp td:last-child{background:#4c9aff14;color:var(--txt)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;padding:0 14px}
+summary{cursor:pointer;padding:12px 0;font-weight:600;list-style-position:inside}
+details p{color:var(--mut);padding:0 0 12px;font-size:14px}
 footer{border-top:1px solid var(--line);color:var(--mut);text-align:center;padding:24px 0;font-size:13px;margin-top:40px}
 </style>
 </head>
@@ -154,6 +179,35 @@ footer{border-top:1px solid var(--line);color:var(--mut);text-align:center;paddi
       <div class="card why"><span data-icon="light"></span><div><h4 data-i18n="w3t"></h4><p data-i18n="w3d"></p></div></div>
       <div class="card why"><span data-icon="bolt"></span><div><h4 data-i18n="w4t"></h4><p data-i18n="w4d"></p></div></div>
     </div>
+  </section>
+
+  <!-- WHY -->
+  <section id="why">
+    <h2><span data-icon="bulb"></span><span data-i18n="whyT"></span></h2>
+    <p class="sub" data-i18n="whyP"></p>
+    <div class="vs">
+      <div class="card">
+        <svg class="big" viewBox="0 0 200 150" fill="none">
+          <rect x="20" y="15" width="160" height="110" rx="10" fill="#1c2330" stroke="#394456" stroke-width="2"/>
+          <path d="M100 40 140 62v38l-40 22-40-22V62z" fill="#394456" stroke="#566178" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M60 62l40 22 40-22M100 84v38" stroke="#566178" stroke-width="2"/>
+          <rect x="140" y="20" width="34" height="18" rx="5" fill="#f0b42933" stroke="#f0b429"/>
+          <path d="M152 29h10" stroke="#f0b429" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <h4 data-i18n="whyA_t"></h4><p data-i18n="whyA_d"></p>
+      </div>
+      <div class="card good">
+        <svg class="big" viewBox="0 0 200 150" fill="none">
+          <rect x="20" y="15" width="160" height="110" rx="10" fill="#0f1522" stroke="#4c9aff" stroke-width="2" stroke-dasharray="6 4"/>
+          <path d="M100 40 140 62v38l-40 22-40-22V62z" fill="#4c9aff55" stroke="#4c9aff" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M60 62l40 22 40-22M100 84v38" stroke="#7c5cff" stroke-width="2.5"/>
+          <path d="M36 80a64 20 0 0 0 128 0" stroke="#3fb950" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="m158 74 6 6-8 3" stroke="#3fb950" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h4 data-i18n="whyB_t"></h4><p data-i18n="whyB_d"></p>
+      </div>
+    </div>
+    <div class="note" style="background:#4c9aff14;border-color:#4c9aff55"><span data-icon="info"></span><span data-i18n="whyC"></span></div>
   </section>
 
   <!-- HOW -->
