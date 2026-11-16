@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UIObject3D</title>
+<style>
+:root{
+  --bg:#0d1117;--panel:#161b22;--panel2:#1c2330;--line:#2a3344;--txt:#e6edf3;--mut:#8b98a9;
+  --acc:#4c9aff;--acc2:#7c5cff;--ok:#3fb950;--warn:#f0b429;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:radial-gradient(1200px 600px at 80% -10%,#1a2440 0,transparent 60%),var(--bg);color:var(--txt);
+  font-family:"Segoe UI",Tahoma,"Noto Sans Arabic",system-ui,sans-serif;line-height:1.7;min-height:100vh}
+a{color:var(--acc)}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:20;background:rgba(13,17,23,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+.logo svg{width:30px;height:30px}
+.lang{display:flex;gap:6px;background:var(--panel);border:1px solid var(--line);padding:4px;border-radius:12px}
+.lang button{background:none;border:0;color:var(--mut);padding:6px 14px;border-radius:8px;cursor:pointer;font:600 14px inherit;font-family:inherit}
+.lang button.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+.hero{padding:34px 0 10px;text-align:center}
+.hero h1{font-size:clamp(28px,5vw,46px);line-height:1.25;background:linear-gradient(135deg,#fff,var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--mut);max-width:720px;margin:12px auto 0;font-size:17px}
+.demo{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;margin:26px 0}
+@media(max-width:860px){.demo{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+.screen{padding:0;overflow:hidden}
+.screen .top{display:flex;align-items:center;gap:8px;padding:8px 14px;background:#10151d;border-bottom:1px solid var(--line);font:12px ui-monospace,Consolas,monospace;color:var(--mut);direction:ltr}
+.dots{display:flex;gap:6px}.dots i{width:10px;height:10px;border-radius:50%;background:#394456;display:block}
+.stage{position:relative;background:
+  linear-gradient(#ffffff08 1px,transparent 1px) 0 0/28px 28px,
+  linear-gradient(90deg,#ffffff08 1px,transparent 1px) 0 0/28px 28px,#0a0e14;padding:18px;display:flex;justify-content:center}
+.vf{position:relative;width:100%;max-width:440px;aspect-ratio:1;border:2px dashed #4c9aff88;border-radius:12px;background:radial-gradient(circle at 50% 40%,#1f2b45,#0f1522);cursor:grab;touch-action:none}
+.vf:active{cursor:grabbing}
+.vf canvas{width:100%;height:100%;display:block;border-radius:10px}
+.tag{position:absolute;top:-12px;left:12px;background:var(--acc);color:#fff;font:600 11px ui-monospace,Consolas,monospace;padding:2px 8px;border-radius:6px;direction:ltr}
+.hint{position:absolute;bottom:8px;inset-inline:0;text-align:center;font-size:12px;color:var(--mut);pointer-events:none;display:flex;justify-content:center;align-items:center;gap:6px}
+.hint svg{width:16px;height:16px}
+.ctrl h3{display:flex;align-items:center;gap:8px;font-size:17px;margin-bottom:12px}
+.ctrl h3 svg{width:20px;height:20px}
+.row{display:grid;grid-template-columns:110px 1fr 54px;gap:8px;align-items:center;margin:9px 0;font-size:14px}
+.row output{font:12px ui-monospace,Consolas,monospace;color:var(--acc);text-align:end;direction:ltr}
+input[type=range]{width:100%;accent-color:var(--acc)}
+.shapes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.shapes button,.tg button{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:8px 4px;cursor:pointer;font:600 12px inherit;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:4px}
+.shapes button svg{width:30px;height:30px}
+.shapes button.on,.tg button.on{border-color:var(--acc);background:#4c9aff22}
+.tg{display:flex;gap:8px;margin-top:10px}
+.tg button{flex:1;flex-direction:row;justify-content:center;padding:9px}
+.tg svg{width:16px;height:16px}
+section{margin:44px 0}
+section>h2{display:flex;align-items:center;gap:10px;font-size:26px;margin-bottom:6px}
+section>h2 svg{width:30px;height:30px;flex:none}
+section>.sub{color:var(--mut);margin-bottom:18px}
+.pipe{display:flex;align-items:stretch;gap:6px;flex-wrap:wrap}
+.step{flex:1 1 150px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center;position:relative}
+.step svg.ic{width:48px;height:48px;margin-bottom:6px}
+.step b{display:block;margin-bottom:4px}
+.step small{color:var(--mut);font-size:13px;display:block;line-height:1.5}
+.step .n{position:absolute;top:8px;inset-inline-start:10px;font:700 12px ui-monospace;color:var(--acc)}
+.arrow{align-self:center;width:24px;flex:none}
+html[dir=rtl] .arrow{transform:scaleX(-1)}
+@media(max-width:700px){.arrow{display:none}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.why{display:flex;gap:12px}
+.why svg{width:36px;height:36px;flex:none}
+.why h4{margin-bottom:2px}.why p{color:var(--mut);font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:14px;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+th,td{padding:10px 12px;text-align:start;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--panel2);color:var(--mut);font-weight:600}
+td:first-child{font:600 13px ui-monospace,Consolas,monospace;color:var(--acc);direction:ltr;text-align:left;white-space:nowrap}
+tr:last-child td{border:0}
+.code{position:relative;background:#0a0e14;border:1px solid var(--line);border-radius:14px;direction:ltr;text-align:left}
+.code .hd{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);color:var(--mut);font:12px ui-monospace,Consolas,monospace}
+.code button{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12px;display:flex;gap:6px;align-items:center}
+.code button svg{width:14px;height:14px}
+pre{padding:14px;overflow:auto;font:13px/1.65 ui-monospace,Consolas,monospace;color:#c9d6e6}
+.k{color:#ff7b9c}.s{color:#9ad98b}.c{color:#6b7a90}.f{color:#7cc4ff}.nn{color:#f0b429}
+.tips li{list-style:none;display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.tips li:last-child{border:0}
+.tips svg{width:22px;height:22px;flex:none;margin-top:3px}
+.note{display:flex;gap:10px;background:#f0b4291a;border:1px solid #f0b42955;border-radius:12px;padding:12px 14px;margin-top:14px;font-size:14px}
+.note svg{width:22px;height:22px;flex:none;margin-top:2px}
+.q{margin-bottom:16px}
+.q p{font-weight:600;margin-bottom:8px}
+.q .opts{display:flex;flex-wrap:wrap;gap:8px}
+.q button{background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:8px 14px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:14px}
+.q button.good{border-color:var(--ok);background:#3fb95022}
+.q button.bad{border-color:#f85149;background:#f8514922}
+.score{font-weight:700;color:var(--ok)}
+footer{border-top:1px solid var(--line);color:var(--mut);text-align:center;padding:24px 0;font-size:13px;margin-top:40px}
+</style>
+</head>
+<body>
+<header><div class="wrap bar">
+  <div class="logo"><span data-icon="logo"></span><span>UIObject3D</span></div>
+  <div class="lang" role="group" aria-label="Language">
+    <button data-l="ar">العربية</button><button data-l="fr">Français</button><button data-l="en">English</button>
+  </div>
+</div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <h1 data-i18n="h1"></h1>
+    <p data-i18n="lead"></p>
+  </div>
+
+  <!-- DEMO -->
+  <div class="demo">
+    <div class="card screen">
+      <div class="top"><div class="dots"><i></i><i></i><i></i></div><span>ScreenGui &gt; ViewportFrame &gt; WorldModel</span></div>
+      <div class="stage">
+        <div class="vf" id="vf">
+          <span class="tag">ViewportFrame</span>
+          <canvas id="cv"></canvas>
+          <div class="hint"><span data-icon="hand"></span><span data-i18n="hint"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card ctrl">
+      <h3><span data-icon="cube"></span><span data-i18n="chooseObj"></span></h3>
+      <div class="shapes" id="shapes"></div>
+      <h3 style="margin-top:14px"><span data-icon="sliders"></span><span data-i18n="props"></span></h3>
+      <div class="row"><label data-i18n="p_fov"></label><input type="range" id="fov" min="20" max="100" value="45"><output id="o_fov"></output></div>
+      <div class="row"><label data-i18n="p_dist"></label><input type="range" id="dist" min="2" max="9" step="0.1" value="4.6"><output id="o_dist"></output></div>
+      <div class="row"><label data-i18n="p_amb"></label><input type="range" id="amb" min="0" max="1" step="0.05" value="0.35"><output id="o_amb"></output></div>
+      <div class="row"><label data-i18n="p_light"></label><input type="range" id="lgt" min="-180" max="180" value="40"><output id="o_lgt"></output></div>
+      <div class="row"><label data-i18n="p_speed"></label><input type="range" id="spd" min="0" max="3" step="0.1" value="0.6"><output id="o_spd"></output></div>
+      <div class="tg">
+        <button id="tAuto" class="on"><span data-icon="spin"></span><span data-i18n="auto"></span></button>
+        <button id="tWire"><span data-icon="wire"></span><span data-i18n="wire"></span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:10px">
+    <div class="code"><div class="hd"><span data-i18n="liveCode"></span><button data-copy="live"><span data-icon="copy"></span><span data-i18n="copy"></span></button></div>
+      <pre id="live"></pre></div>
+  </div>
+
+  <!-- WHAT -->
+  <section id="what">
+    <h2><span data-icon="info"></span><span data-i18n="s1"></span></h2>
+    <p class="sub" data-i18n="s1p"></p>
+    <div class="grid2">
+      <div class="card why"><span data-icon="layers"></span><div><h4 data-i18n="w1t"></h4><p data-i18n="w1d"></p></div></div>
+      <div class="card why"><span data-icon="frame"></span><div><h4 data-i18n="w2t"></h4><p data-i18n="w2d"></p></div></div>
+      <div class="card why"><span data-icon="light"></span><div><h4 data-i18n="w3t"></h4><p data-i18n="w3d"></p></div></div>
+      <div class="card why"><span data-icon="bolt"></span><div><h4 data-i18n="w4t"></h4><p data-i18n="w4d"></p></div></div>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section id="how">
+    <h2><span data-icon="flow"></span><span data-i18n="s2"></span></h2>
+    <p class="sub" data-i18n="s2p"></p>
+    <div class="pipe">
+      <div class="step"><span class="n">1</span><span data-icon="cube" data-cls="ic"></span><b data-i18n="st1t"></b><small data-i18n="st1d"></small></div>
+      <div class="arrow" data-icon="arrow"></div>
+      <div class="step"><span class="n">2</span><span data-icon="layers" data-cls="ic"></span><b data-i18n="st2t"></b><small data-i18n="st2d"></small></div>
+      <div class="arrow" data-icon="arrow"></div>
+      <div class="step"><span class="n">3</span><span data-icon="camera" data-cls="ic"></span><b data-i18n="st3t"></b><small data-i18n="st3d"></small></div>
+      <div class="arrow" data-icon="arrow"></div>
+      <div class="step"><span class="n">4</span><span data-icon="frame" data-cls="ic"></span><b data-i18n="st4t"></b><small data-i18n="st4d"></small></div>
+    </div>
+  </section>
+
+  <!-- PROPS -->
+  <section id="props">
+    <h2><span data-icon="sliders"></span><span data-i18n="s3"></span></h2>
+    <p class="sub" data-i18n="s3p"></p>
+    <table>
+      <thead><tr><th data-i18n="th1"></th><th data-i18n="th2"></th></tr></thead>
+      <tbody id="ptable"></tbody>
+    </table>
+    <div class="note"><span data-icon="warn"></span><span data-i18n="noteApi"></span></div>
+  </section>
+
+  <!-- CODE -->
+  <section id="code">
+    <h2><span data-icon="code"></span><span data-i18n="s4"></span></h2>
+    <p class="sub" data-i18n="s4p"></p>
+    <div class="code"><div class="hd"><span>Luau — ViewportFrame</span><button data-copy="c1"><span data-icon="copy"></span><span data-i18n="copy"></span></button></div>
+<pre id="c1"><span class="c">-- 1) </span><span class="c" data-i18n="cm1"></span>
+<span class="k">local</span> viewport = <span class="f">Instance.new</span>(<span class="s">"ViewportFrame"</span>)
+viewport.Size = <span class="f">UDim2.fromOffset</span>(<span class="nn">300</span>, <span class="nn">300</span>)
+viewport.BackgroundTransparency = <span class="nn">1</span>
+viewport.Ambient = <span class="f">Color3.fromRGB</span>(<span class="nn">90</span>, <span class="nn">90</span>, <span class="nn">90</span>)
+viewport.LightColor = <span class="f">Color3.fromRGB</span>(<span class="nn">255</span>, <span class="nn">255</span>, <span class="nn">255</span>)
+viewport.LightDirection = <span class="f">Vector3.new</span>(-<span class="nn">1</span>, -<span class="nn">1</span>, -<span class="nn">1</span>)
+viewport.Parent = screenGui
+
+<span class="c">-- 2) </span><span class="c" data-i18n="cm2"></span>
+<span class="k">local</span> model = <span class="f">game</span>.ReplicatedStorage.Sword:<span class="f">Clone</span>()
+model.Parent = viewport
+
+<span class="c">-- 3) </span><span class="c" data-i18n="cm3"></span>
+<span class="k">local</span> camera = <span class="f">Instance.new</span>(<span class="s">"Camera"</span>)
+camera.FieldOfView = <span class="nn">45</span>
+camera.CFrame = <span class="f">CFrame.new</span>(<span class="f">Vector3.new</span>(<span class="nn">0</span>, <span class="nn">0</span>, <span class="nn">5</span>), <span class="f">Vector3.zero</span>)
+camera.Parent = viewport
+viewport.CurrentCamera = camera
+
+<span class="c">-- 4) </span><span class="c" data-i18n="cm4"></span>
+<span class="k">local</span> angle = <span class="nn">0</span>
+<span class="f">game</span>:<span class="f">GetService</span>(<span class="s">"RunService"</span>).RenderStepped:<span class="f">Connect</span>(<span class="k">function</span>(dt)
+    angle += dt
+    model:<span class="f">PivotTo</span>(<span class="f">CFrame.Angles</span>(<span class="nn">0</span>, angle, <span class="nn">0</span>))
+<span class="k">end</span>)</pre></div>
+
+    <div style="height:16px"></div>
+    <div class="code"><div class="hd"><span data-i18n="wrapTitle"></span><button data-copy="c2"><span data-icon="copy"></span><span data-i18n="copy"></span></button></div>
+<pre id="c2"><span class="c">-- </span><span class="c" data-i18n="cm5"></span>
+<span class="k">local</span> UIObject3D = <span class="f">require</span>(script.Parent.UIObject3D)
+
+<span class="k">local</span> obj = UIObject3D.<span class="f">new</span>(<span class="f">game</span>.ReplicatedStorage.Sword)
+obj.Instance.Size = <span class="f">UDim2.fromOffset</span>(<span class="nn">300</span>, <span class="nn">300</span>)
+obj.Instance.Parent = screenGui
+obj.CameraDistance = <span class="nn">5</span>
+obj.FieldOfView = <span class="nn">45</span></pre></div>
+  </section>
+
+  <!-- TIPS -->
+  <section id="tips">
+    <h2><span data-icon="light"></span><span data-i18n="s5"></span></h2>
+    <div class="card"><ul class="tips">
+      <li><span data-icon="check"></span><span data-i18n="t1"></span></li>
+      <li><span data-icon="check"></span><span data-i18n="t2"></span></li>
+      <li><span data-icon="check"></span><span data-i18n="t3"></span></li>
+      <li><span data-icon="check"></span><span data-i18n="t4"></span></li>
+      <li><span data-icon="check"></span><span data-i18n="t5"></span></li>
+    </ul></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz">
+    <h2><span data-icon="quiz"></span><span data-i18n="s6"></span> <span class="score" id="score"></span></h2>
+    <div class="card" id="quizBox"></div>
+  </section>
+</main>
+<footer><div class="wrap" data-i18n="foot"></div></footer>
+
+<script>
+/* ============ ICONS (SVG, no emoji) ============ */
+const G='stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"';
+const ICONS={
+logo:`<svg viewBox="0 0 64 64"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4c9aff"/><stop offset="1" stop-color="#7c5cff"/></linearGradient></defs><path d="M32 6 56 19v26L32 58 8 45V19z" fill="url(#lg)" opacity=".25" stroke="url(#lg)" stroke-width="3" stroke-linejoin="round"/><path d="M8 19l24 13 24-13M32 32v26" stroke="url(#lg)" stroke-width="3" fill="none" stroke-linejoin="round"/></svg>`,
+cube:`<svg viewBox="0 0 24 24" ${G} style="color:#4c9aff"><path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>`,
+layers:`<svg viewBox="0 0 24 24" ${G} style="color:#7c5cff"><path d="M12 3 2 8l10 5 10-5z"/><path d="m2 13 10 5 10-5M2 17.5l10 5 10-5" opacity=".6"/></svg>`,
+camera:`<svg viewBox="0 0 24 24" ${G} style="color:#3fb950"><path d="M4 7h3l2-3h6l2 3h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.6"/></svg>`,
+frame:`<svg viewBox="0 0 24 24" ${G} style="color:#f0b429"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="m9 17 2.5-3 2 2 2-3 2 4" /></svg>`,
+light:`<svg viewBox="0 0 24 24" ${G} style="color:#f0b429"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.7.6 1 1.3 1 2.1h5c0-.8.3-1.5 1-2.1A6 6 0 0 0 12 3z"/></svg>`,
+bolt:`<svg viewBox="0 0 24 24" ${G} style="color:#ff7b9c"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>`,
+info:`<svg viewBox="0 0 24 24" ${G} style="color:#4c9aff"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>`,
+flow:`<svg viewBox="0 0 24 24" ${G} style="color:#7c5cff"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><path d="M9 6h4a2 2 0 0 1 2 2v7"/></svg>`,
+sliders:`<svg viewBox="0 0 24 24" ${G} style="color:#4c9aff"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>`,
+code:`<svg viewBox="0 0 24 24" ${G} style="color:#3fb950"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>`,
+check:`<svg viewBox="0 0 24 24" ${G} style="color:#3fb950"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.8 2.8L16 9.5"/></svg>`,
+warn:`<svg viewBox="0 0 24 24" ${G} style="color:#f0b429"><path d="M12 3 2 20h20z"/><path d="M12 10v5M12 17.5v.01"/></svg>`,
+quiz:`<svg viewBox="0 0 24 24" ${G} style="color:#ff7b9c"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17v.01"/></svg>`,
+hand:`<svg viewBox="0 0 24 24" ${G}><path d="M8 12V6a1.5 1.5 0 0 1 3 0v5M11 11V4.5a1.5 1.5 0 0 1 3 0V11M14 11V6a1.5 1.5 0 0 1 3 0v8a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-3l-2-3a1.5 1.5 0 0 1 2.4-1.7L8 14"/></svg>`,
+spin:`<svg viewBox="0 0 24 24" ${G}><path d="M20 12a8 8 0 1 1-3-6.2M20 4v5h-5"/></svg>`,
+wire:`<svg viewBox="0 0 24 24" ${G}><path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>`,
+copy:`<svg viewBox="0 0 24 24" ${G}><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>`,
+arrow:`<svg viewBox="0 0 24 24" ${G} style="color:#8b98a9;width:24px;height:24px"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`
+};
+function renderIcons(root=document){
+  root.querySelectorAll('[data-icon]').forEach(e=>{
+    e.innerHTML=ICONS[e.dataset.icon]||'';
+    if(e.dataset.cls){const s=e.firstElementChild;s&&s.classList.add(e.dataset.cls);e.style.display='contents'}
+    else if(!e.classList.contains('arrow')){e.style.display='inline-flex';const s=e.firstElementChild;if(s&&!s.getAttribute('style')?.includes('width')){} }
+  });
+}
+
+/* ============ I18N ============ */
+const T={
+ar:{
+h1:"UIObject3D — اعرض مجسمات ثلاثية الأبعاد داخل واجهة المستخدم",
+lead:"تعلّم كيف تُظهر نماذج 3D حقيقية داخل عناصر الـ GUI في Roblox باستخدام ViewportFrame وأسلوب UIObject3D، مع عرض تفاعلي تتحكم فيه بنفسك.",
+hint:"اسحب للتدوير • عجلة الماوس للتقريب",chooseObj:"اختر المجسّم",props:"خصائص العرض",
+p_fov:"زاوية الرؤية",p_dist:"بُعد الكاميرا",p_amb:"الإضاءة المحيطة",p_light:"اتجاه الضوء",p_speed:"سرعة الدوران",
+auto:"دوران تلقائي",wire:"شبكة سلكية",liveCode:"الكود يتحدّث مباشرة مع تغييراتك",copy:"نسخ",
+shape_cube:"مكعب",shape_pyr:"هرم",shape_gem:"جوهرة",shape_hex:"منشور",
+s1:"ما هو UIObject3D؟",s1p:"هو أسلوب (وموديول مجتمعي شائع) يسهّل عرض أي Model أو Part أو Mesh ثلاثي الأبعاد داخل عنصر واجهة ثنائي الأبعاد، مثل صورة سلاح في المتجر أو شخصية في شاشة الاختيار.",
+w1t:"مجسّم حقيقي داخل الـ UI",w1d:"بدل صورة ثابتة تحصل على نموذج 3D يدور ويتفاعل ويُضاء.",
+w2t:"مبني على ViewportFrame",w2d:"يعتمد على الـ ViewportFrame الأصلي ويلفّه بخصائص أبسط وأسهل.",
+w3t:"تحكّم كامل بالمشهد",w3d:"الكاميرا وزاوية الرؤية والإضاءة واللون المحيط كلها قابلة للضبط.",
+w4t:"مثالي للمتاجر والمخزون",w4d:"عرض الأسلحة والأزياء والمركبات وشاشات اختيار الشخصيات بسهولة.",
+s2:"كيف يعمل؟",s2p:"أربع خطوات تتكرر في كل عرض ثلاثي الأبعاد داخل الواجهة:",
+st1t:"المجسّم",st1d:"Model أو Part تريد عرضه، ويُنسخ (Clone) ولا يُستخدم الأصل.",
+st2t:"الحاوية",st2d:"يوضع النسخ داخل ViewportFrame (أو WorldModel) ليُرسم بمعزل عن العالم.",
+st3t:"الكاميرا",st3d:"كاميرا خاصة (CurrentCamera) تحدد الزاوية والبُعد والـ FOV.",
+st4t:"الواجهة",st4d:"الـ ViewportFrame يعرض الناتج كأي عنصر UI، بحجم وموضع تحدده.",
+s3:"أهم الخصائص",s3p:"هذه الخصائص هي التي تتحكم بها في العرض التفاعلي أعلاه:",
+th1:"الخاصية",th2:"الوصف",
+pr_Object:"المجسّم المعروض (Model/Part/Mesh).",
+pr_CameraDistance:"المسافة بين الكاميرا والمجسّم؛ كلما زادت بدا أصغر.",
+pr_FieldOfView:"زاوية الرؤية بالدرجات؛ الصغيرة تقرّب والكبيرة تعطي منظوراً مبالغاً.",
+pr_Ambient:"لون الإضاءة العامة التي تصيب كل الأوجه بالتساوي.",
+pr_LightColor:"لون الضوء الاتجاهي الرئيسي.",
+pr_LightDirection:"الاتجاه الذي يسقط منه الضوء ويحدّد الظلال على الأوجه.",
+pr_Rotation:"دوران المجسّم (CFrame.Angles) يدويًا أو تلقائيًا كل إطار.",
+noteApi:"ملاحظة: أسماء الخصائص في موديول UIObject3D قد تختلف قليلاً بين الإصدارات؛ راجع صفحة الموديول الذي تستخدمه. خصائص ViewportFrame الأصلية (Ambient, LightColor, LightDirection, CurrentCamera) ثابتة ومؤكدة.",
+s4:"التنفيذ بالكود",s4p:"أولاً الطريقة الأصلية بـ ViewportFrame لتفهم الأساس، ثم الاستخدام المبسّط عبر موديول UIObject3D.",
+cm1:"أنشئ الـ ViewportFrame واضبط الإضاءة",cm2:"انسخ المجسّم وضعه داخل الـ ViewportFrame",cm3:"أنشئ كاميرا مخصصة واربطها",cm4:"دوّر المجسّم في كل إطار",
+wrapTitle:"الاستخدام المبسّط (توضيحي)",cm5:"مثال توضيحي لأسلوب الموديول — راجع توثيق إصدارك",
+s5:"نصائح احترافية",
+t1:"استخدم Clone دائمًا ولا تنقل الـ Model الأصلي من مكانه.",
+t2:"اجعل BackgroundTransparency = 1 ليظهر المجسّم فوق خلفية واجهتك.",
+t3:"اضبط مركز المجسّم (PrimaryPart/Pivot) عند الأصل ليدور حول نفسه.",
+t4:"قلّل عدد الـ ViewportFrames النشطة معًا لتحافظ على الأداء، خاصة على الجوال.",
+t5:"ضع الكاميرا بحسب حجم المجسّم: BoundingBox أكبر يحتاج CameraDistance أكبر.",
+s6:"اختبر نفسك",quizOk:"أحسنت!",quizNo:"حاول مرة أخرى",
+q1:"أي عنصر Roblox يُرسم داخله المجسّم؟",q1a:["ScreenGui","ViewportFrame","TextLabel"],
+q2:"ماذا يحدث عند زيادة CameraDistance؟",q2a:["يكبر المجسّم","يصغر المجسّم","لا تغيير"],
+q3:"ما الذي يجب فعله بالمجسّم الأصلي قبل عرضه؟",q3a:["حذفه","Clone","تغيير اسمه"],
+foot:"صفحة تعليمية مستقلة — العرض هنا محاكاة بالمتصفح لشرح الفكرة."
+},
+fr:{
+h1:"UIObject3D — Affichez des objets 3D dans votre interface",
+lead:"Apprenez à montrer de vrais modèles 3D dans les éléments d'interface de Roblox avec ViewportFrame et le style UIObject3D, grâce à une démo interactive.",
+hint:"Glissez pour tourner • Molette pour zoomer",chooseObj:"Choisir l'objet",props:"Propriétés d'affichage",
+p_fov:"Champ de vision",p_dist:"Distance caméra",p_amb:"Lumière ambiante",p_light:"Direction lumière",p_speed:"Vitesse rotation",
+auto:"Rotation auto",wire:"Fil de fer",liveCode:"Le code se met à jour en direct",copy:"Copier",
+shape_cube:"Cube",shape_pyr:"Pyramide",shape_gem:"Gemme",shape_hex:"Prisme",
+s1:"Qu'est-ce que UIObject3D ?",s1p:"C'est une approche (et un module communautaire courant) qui simplifie l'affichage d'un Model, Part ou Mesh 3D dans un élément d'interface 2D : une arme dans une boutique, un personnage dans un écran de sélection.",
+w1t:"Un vrai objet 3D dans l'UI",w1d:"Au lieu d'une image fixe, un modèle 3D qui tourne, réagit et s'éclaire.",
+w2t:"Basé sur ViewportFrame",w2d:"Repose sur le ViewportFrame natif avec des réglages plus simples.",
+w3t:"Contrôle total de la scène",w3d:"Caméra, champ de vision, éclairage et lumière ambiante sont réglables.",
+w4t:"Idéal boutiques et inventaires",w4d:"Armes, tenues, véhicules et sélection de personnages facilement.",
+s2:"Comment ça marche ?",s2p:"Quatre étapes se répètent pour chaque affichage 3D dans l'interface :",
+st1t:"L'objet",st1d:"Le Model ou Part à afficher ; on le clone, on n'utilise jamais l'original.",
+st2t:"Le conteneur",st2d:"Le clone est placé dans un ViewportFrame (ou WorldModel), isolé du monde.",
+st3t:"La caméra",st3d:"Une caméra dédiée (CurrentCamera) définit l'angle, la distance et le FOV.",
+st4t:"L'interface",st4d:"Le ViewportFrame affiche le rendu comme tout élément d'UI, à la taille voulue.",
+s3:"Propriétés clés",s3p:"Ce sont les propriétés que vous contrôlez dans la démo ci-dessus :",
+th1:"Propriété",th2:"Description",
+pr_Object:"L'objet affiché (Model/Part/Mesh).",
+pr_CameraDistance:"Distance caméra-objet ; plus elle est grande, plus l'objet paraît petit.",
+pr_FieldOfView:"Champ de vision en degrés ; petit = zoom, grand = perspective exagérée.",
+pr_Ambient:"Couleur de la lumière générale qui touche toutes les faces.",
+pr_LightColor:"Couleur de la lumière directionnelle principale.",
+pr_LightDirection:"Direction d'où vient la lumière ; définit l'ombrage des faces.",
+pr_Rotation:"Rotation de l'objet (CFrame.Angles), manuelle ou à chaque image.",
+noteApi:"Remarque : les noms de propriétés du module UIObject3D peuvent varier selon la version ; consultez la page de votre module. Les propriétés natives de ViewportFrame (Ambient, LightColor, LightDirection, CurrentCamera) sont, elles, sûres.",
+s4:"Mise en œuvre en code",s4p:"D'abord la méthode native avec ViewportFrame pour comprendre la base, puis l'usage simplifié via le module UIObject3D.",
+cm1:"Créer le ViewportFrame et régler la lumière",cm2:"Cloner l'objet et le placer dans le ViewportFrame",cm3:"Créer une caméra dédiée et l'associer",cm4:"Faire tourner l'objet à chaque image",
+wrapTitle:"Usage simplifié (illustratif)",cm5:"Exemple illustratif du style module — voir la doc de votre version",
+s5:"Conseils de pro",
+t1:"Utilisez toujours Clone ; ne déplacez jamais le Model original.",
+t2:"Mettez BackgroundTransparency = 1 pour voir l'objet sur le fond de votre UI.",
+t3:"Centrez l'objet (PrimaryPart/Pivot) à l'origine pour qu'il tourne sur lui-même.",
+t4:"Limitez le nombre de ViewportFrames actifs pour préserver les performances, surtout sur mobile.",
+t5:"Adaptez la caméra à la taille : une BoundingBox plus grande exige une CameraDistance plus grande.",
+s6:"Testez-vous",quizOk:"Bravo !",quizNo:"Réessayez",
+q1:"Quel élément Roblox dessine l'objet ?",q1a:["ScreenGui","ViewportFrame","TextLabel"],
+q2:"Que se passe-t-il si CameraDistance augmente ?",q2a:["L'objet grossit","L'objet rapetisse","Rien"],
+q3:"Que faire de l'objet original avant de l'afficher ?",q3a:["Le supprimer","Le cloner","Le renommer"],
+foot:"Page éducative autonome — l'affichage ici est une simulation navigateur pour expliquer l'idée."
+},
+en:{
+h1:"UIObject3D — Show 3D Objects Inside Your UI",
+lead:"Learn how to display real 3D models inside Roblox GUI elements using ViewportFrame and the UIObject3D approach, with an interactive demo you control.",
+hint:"Drag to rotate • Scroll to zoom",chooseObj:"Choose object",props:"Display properties",
+p_fov:"Field of view",p_dist:"Camera distance",p_amb:"Ambient light",p_light:"Light direction",p_speed:"Spin speed",
+auto:"Auto spin",wire:"Wireframe",liveCode:"Code updates live with your changes",copy:"Copy",
+shape_cube:"Cube",shape_pyr:"Pyramid",shape_gem:"Gem",shape_hex:"Prism",
+s1:"What is UIObject3D?",s1p:"It is an approach (and a popular community module) that makes it easy to render any 3D Model, Part or Mesh inside a 2D interface element, like a weapon in a shop or a character on a selection screen.",
+w1t:"A real 3D object in the UI",w1d:"Instead of a flat image, a 3D model that spins, reacts and is lit.",
+w2t:"Built on ViewportFrame",w2d:"Relies on the native ViewportFrame and wraps it with simpler settings.",
+w3t:"Full scene control",w3d:"Camera, field of view, lighting and ambient color are all adjustable.",
+w4t:"Perfect for shops and inventories",w4d:"Show weapons, outfits, vehicles and character pickers with ease.",
+s2:"How does it work?",s2p:"Four steps repeat in every 3D-in-UI display:",
+st1t:"The object",st1d:"The Model or Part to show. You clone it and never use the original.",
+st2t:"The container",st2d:"The clone goes inside a ViewportFrame (or WorldModel), isolated from the world.",
+st3t:"The camera",st3d:"A dedicated camera (CurrentCamera) sets the angle, distance and FOV.",
+st4t:"The interface",st4d:"The ViewportFrame shows the result like any UI element, at your chosen size.",
+s3:"Key properties",s3p:"These are the properties you control in the interactive demo above:",
+th1:"Property",th2:"Description",
+pr_Object:"The displayed object (Model/Part/Mesh).",
+pr_CameraDistance:"Distance between camera and object; larger means the object looks smaller.",
+pr_FieldOfView:"Field of view in degrees; small zooms in, large exaggerates perspective.",
+pr_Ambient:"Color of the general light that hits every face equally.",
+pr_LightColor:"Color of the main directional light.",
+pr_LightDirection:"The direction the light comes from; it shades each face.",
+pr_Rotation:"Object rotation (CFrame.Angles), manual or every frame.",
+noteApi:"Note: property names in the UIObject3D module may differ slightly between versions; check the page of the module you use. Native ViewportFrame properties (Ambient, LightColor, LightDirection, CurrentCamera) are reliable.",
+s4:"Implementation in code",s4p:"First the native ViewportFrame way to understand the basics, then the simplified usage through the UIObject3D module.",
+cm1:"Create the ViewportFrame and set the lighting",cm2:"Clone the object and put it in the ViewportFrame",cm3:"Create a dedicated camera and assign it",cm4:"Rotate the object every frame",
+wrapTitle:"Simplified usage (illustrative)",cm5:"Illustrative module-style example — check your version's docs",
+s5:"Pro tips",
+t1:"Always Clone; never move the original Model.",
+t2:"Set BackgroundTransparency = 1 so the object shows over your UI background.",
+t3:"Center the object (PrimaryPart/Pivot) at the origin so it spins around itself.",
+t4:"Limit how many ViewportFrames are active at once to protect performance, especially on mobile.",
+t5:"Fit the camera to the size: a bigger BoundingBox needs a larger CameraDistance.",
+s6:"Test yourself",quizOk:"Well done!",quizNo:"Try again",
+q1:"Which Roblox element draws the object?",q1a:["ScreenGui","ViewportFrame","TextLabel"],
+q2:"What happens when CameraDistance increases?",q2a:["Object gets bigger","Object gets smaller","No change"],
+q3:"What should you do with the original object before showing it?",q3a:["Delete it","Clone it","Rename it"],
+foot:"Standalone educational page — the view here is a browser simulation to explain the idea."
+}
+};
+const PROPS=["Object","CameraDistance","FieldOfView","Ambient","LightColor","LightDirection","Rotation"];
+let lang=localStorage.getItem('u3d_lang')||'ar';
+try{}catch(e){}
+function setLang(l){
+  lang=l;try{localStorage.setItem('u3d_lang',l)}catch(e){}
+  const d=T[l];
+  document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(e=>{e.textContent=d[e.dataset.i18n]||''});
+  document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.l===l));
+  document.getElementById('ptable').innerHTML=PROPS.map(p=>`<tr><td>${p}</td><td>${d['pr_'+p]}</td></tr>`).join('');
+  document.querySelectorAll('#shapes button span.lb').forEach((s,i)=>s.textContent=d['shape_'+SHAPE_KEYS[i]]);
+  buildQuiz();document.title="UIObject3D — "+d.s1;
+}
+
+/* ============ 3D ENGINE (software renderer) ============ */
+const SHAPE_KEYS=['cube','pyr','gem','hex'];
+function mkMesh(verts,faces,hues){
+  // orient normals outward (convex shapes centered at origin)
+  faces=faces.map(f=>{
+    const a=verts[f[0]],b=verts[f[1]],c=verts[f[2]];
+    const u=sub(b,a),v=sub(c,a),n=cross(u,v);
+    const ctr=f.reduce((s,i)=>add(s,verts[i]),[0,0,0]).map(x=>x/f.length);
+    return dot(n,ctr)<0?f.slice().reverse():f;
+  });
+  return {verts,faces,hues};
+}
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]],sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const norm=a=>{const l=Math.hypot(...a)||1;return a.map(x=>x/l)};
+const MESH={
+ cube:mkMesh([[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]],
+   [[0,1,2,3],[5,4,7,6],[4,0,3,7],[1,5,6,2],[3,2,6,7],[4,5,1,0]],[210,260,160,30,320,190]),
+ pyr:mkMesh([[-1.1,-.9,-1.1],[1.1,-.9,-1.1],[1.1,-.9,1.1],[-1.1,-.9,1.1],[0,1.3,0]],
+   [[0,1,4],[1,2,4],[2,3,4],[3,0,4],[3,2,1,0]],[10,40,150,200,270]),
+ gem:mkMesh([[0,1.5,0],[0,-1.5,0],[1.1,0,0],[-1.1,0,0],[0,0,1.1],[0,0,-1.1]],
+   [[0,4,2],[0,2,5],[0,5,3],[0,3,4],[1,2,4],[1,5,2],[1,3,5],[1,4,3]],[285,300,315,330,200,215,230,245]),
+ hex:(()=>{const v=[];for(let i=0;i<6;i++){const a=i*Math.PI/3;v.push([Math.cos(a)*1.2,-1,Math.sin(a)*1.2])}
+   for(let i=0;i<6;i++){const a=i*Math.PI/3;v.push([Math.cos(a)*1.2,1,Math.sin(a)*1.2])}
+   const f=[];for(let i=0;i<6;i++){const j=(i+1)%6;f.push([i,j,j+6,i+6])}
+   f.push([0,1,2,3,4,5]);f.push([6,7,8,9,10,11]);
+   return mkMesh(v,f,[160,175,190,205,220,235,120,140])})()
+};
+const S={shape:'cube',yaw:.6,pitch:-.4,vy:0,vp:0,fov:45,dist:4.6,amb:.35,lgt:40,spd:.6,auto:true,wire:false,drag:false};
+
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),vf=document.getElementById('vf');
+let W=0,H=0,DPR=1;
+function resize(){
+  DPR=Math.min(window.devicePixelRatio||1,2);
+  const r=vf.getBoundingClientRect();W=r.width;H=r.height;
+  cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+new ResizeObserver(resize).observe(vf);
+
+function hsl(h,s,l){return `hsl(${h} ${s}% ${l}%)`}
+function render(){
+  ctx.clearRect(0,0,W,H);
+  const m=MESH[S.shape],fovR=S.fov*Math.PI/180,f=(H/2)/Math.tan(fovR/2)*0.62;
+  const cy=Math.cos(S.yaw),sy=Math.sin(S.yaw),cp=Math.cos(S.pitch),sp=Math.sin(S.pitch);
+  const rot=p=>{ // yaw (Y) then pitch (X)
+    let x=p[0]*cy+p[2]*sy,z=-p[0]*sy+p[2]*cy,y=p[1];
+    const y2=y*cp-z*sp,z2=y*sp+z*cp;return [x,y2,z2];
+  };
+  const rv=m.verts.map(rot);
+  const proj=p=>{const z=p[2]+S.dist;return [W/2+p[0]*f/z,H/2-p[1]*f/z,z]};
+  // ground shadow
+  const gs=proj([0,-1.7,0]),sw=Math.max(20,(f/S.dist)*1.5);
+  const g=ctx.createRadialGradient(gs[0],gs[1]+H*.1,2,gs[0],gs[1]+H*.1,sw);
+  g.addColorStop(0,'rgba(0,0,0,.45)');g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(gs[0],gs[1]+H*.1,sw,sw*.3,0,0,7);ctx.fill();
+  // light in view space
+  const la=S.lgt*Math.PI/180,L=norm([Math.sin(la),.7,-Math.cos(la)]);
+  const draw=[];
+  m.faces.forEach((fc,i)=>{
+    const a=rv[fc[0]],b=rv[fc[1]],c=rv[fc[2]];
+    const n=norm(cross(sub(b,a),sub(c,a)));
+    const ctr=fc.reduce((s,k)=>add(s,rv[k]),[0,0,0]).map(x=>x/fc.length);
+    const view=[ctr[0],ctr[1],ctr[2]+S.dist];
+    if(dot(n,view)>=0)return; // back-face cull
+    draw.push({fc,n,z:ctr[2]+S.dist,i});
+  });
+  draw.sort((a,b)=>b.z-a.z);
+  ctx.lineJoin='round';
+  draw.forEach(d=>{
+    const pts=d.fc.map(k=>proj(rv[k]));
+    const diff=Math.max(0,dot(d.n,L)),lit=S.amb+(1-S.amb)*diff;
+    ctx.beginPath();pts.forEach((p,k)=>k?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();
+    if(!S.wire){
+      ctx.fillStyle=hsl(m.hues[d.i%m.hues.length],70,Math.round(12+lit*52));ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,.22)';ctx.lineWidth=1.2;ctx.stroke();
+    }else{
+      ctx.strokeStyle=hsl(m.hues[d.i%m.hues.length],85,45+lit*25);ctx.lineWidth=1.8;ctx.stroke();
+    }
+  });
+}
+let last=performance.now();
+function loop(t){
+  const dt=Math.min(.05,(t-last)/1000);last=t;
+  if(!S.drag){
+    S.yaw+=S.vy;S.pitch+=S.vp;S.vy*=.93;S.vp*=.93;
+    if(S.auto)S.yaw+=S.spd*dt;
+    S.pitch=Math.max(-1.4,Math.min(1.4,S.pitch));
+  }
+  render();requestAnimationFrame(loop);
+}
+/* interaction */
+let lx=0,ly=0;
+vf.addEventListener('pointerdown',e=>{S.drag=true;lx=e.clientX;ly=e.clientY;vf.setPointerCapture(e.pointerId)});
+vf.addEventListener('pointermove',e=>{if(!S.drag)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;
+  S.yaw+=dx*.01;S.pitch=Math.max(-1.4,Math.min(1.4,S.pitch+dy*.01));S.vy=dx*.0015;S.vp=dy*.0015});
+['pointerup','pointercancel'].forEach(n=>vf.addEventListener(n,()=>S.drag=false));
+vf.addEventListener('wheel',e=>{e.preventDefault();S.dist=Math.max(2,Math.min(9,S.dist+e.deltaY*.004));sync()},{passive:false});
+
+/* controls */
+const $=id=>document.getElementById(id);
+const bind=(id,key,fmt)=>{const el=$(id);el.addEventListener('input',()=>{S[key]=+el.value;sync()})};
+bind('fov','fov');bind('dist','dist');bind('amb','amb');bind('lgt','lgt');bind('spd','spd');
+$('tAuto').onclick=()=>{S.auto=!S.auto;$('tAuto').classList.toggle('on',S.auto)};
+$('tWire').onclick=()=>{S.wire=!S.wire;$('tWire').classList.toggle('on',S.wire);sync()};
+const SHAPE_SVG={
+ cube:'<svg viewBox="0 0 32 32" '+G+'><path d="M16 3 27 9v14l-11 6-11-6V9z"/><path d="M5 9l11 6 11-6M16 15v14"/></svg>',
+ pyr:'<svg viewBox="0 0 32 32" '+G+'><path d="M16 3 28 24l-12 5L4 24z"/><path d="M16 3v26M4 24l24 0"/></svg>',
+ gem:'<svg viewBox="0 0 32 32" '+G+'><path d="M16 2 26 16 16 30 6 16z"/><path d="M6 16h20M16 2v28"/></svg>',
+ hex:'<svg viewBox="0 0 32 32" '+G+'><path d="M8 9l8-4 8 4v14l-8 4-8-4z"/><path d="M8 9l8 4 8-4M16 13v14"/></svg>'
+};
+$('shapes').innerHTML=SHAPE_KEYS.map(k=>`<button data-s="${k}" class="${k==='cube'?'on':''}">${SHAPE_SVG[k]}<span class="lb"></span></button>`).join('');
+$('shapes').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.shape=b.dataset.s;
+  document.querySelectorAll('#shapes button').forEach(x=>x.classList.toggle('on',x===b));sync()});
+
+function sync(){
+  $('dist').value=S.dist;
+  $('o_fov').textContent=S.fov+'°';$('o_dist').textContent=S.dist.toFixed(1);
+  $('o_amb').textContent=S.amb.toFixed(2);$('o_lgt').textContent=S.lgt+'°';$('o_spd').textContent=S.spd.toFixed(1);
+  const a=Math.round(S.amb*255),la=S.lgt*Math.PI/180;
+  const lx_=(-Math.sin(la)).toFixed(2),lz_=(Math.cos(la)).toFixed(2);
+  const nm={cube:'Cube',pyr:'Pyramid',gem:'Gem',hex:'Prism'}[S.shape];
+  $('live').innerHTML=
+`<span class="k">local</span> viewport = <span class="f">Instance.new</span>(<span class="s">"ViewportFrame"</span>)
+viewport.Ambient = <span class="f">Color3.fromRGB</span>(<span class="nn">${a}</span>, <span class="nn">${a}</span>, <span class="nn">${a}</span>)
+viewport.LightDirection = <span class="f">Vector3.new</span>(<span class="nn">${lx_}</span>, <span class="nn">-0.70</span>, <span class="nn">${lz_}</span>)
+
+<span class="k">local</span> camera = <span class="f">Instance.new</span>(<span class="s">"Camera"</span>)
+camera.FieldOfView = <span class="nn">${S.fov}</span>
+camera.CFrame = <span class="f">CFrame.new</span>(<span class="f">Vector3.new</span>(<span class="nn">0</span>, <span class="nn">0</span>, <span class="nn">${S.dist.toFixed(1)}</span>), <span class="f">Vector3.zero</span>)
+viewport.CurrentCamera = camera
+
+<span class="c">-- Object: ${nm}${S.wire?' (wireframe preview)':''}</span>`;
+}
+
+/* copy */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-copy]');if(!b)return;
+  const txt=document.getElementById(b.dataset.copy).innerText;
+  (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).catch(()=>{
+    const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(_){}t.remove()});
+  const sp=b.querySelector('[data-i18n]'),old=sp.textContent;sp.textContent='✓';setTimeout(()=>sp.textContent=T[lang].copy,1100);
+});
+
+/* quiz */
+const ANS=[1,1,1];let solved=new Set();
+function buildQuiz(){
+  const d=T[lang];
+  $('quizBox').innerHTML=[1,2,3].map(n=>`<div class="q"><p>${n}. ${d['q'+n]}</p><div class="opts">${d['q'+n+'a'].map((o,i)=>`<button data-q="${n-1}" data-i="${i}">${o}</button>`).join('')}</div></div>`).join('');
+  solved.forEach(q=>{const b=$('quizBox').querySelector(`[data-q="${q}"][data-i="${ANS[q]}"]`);b&&b.classList.add('good')});
+  score();
+}
+function score(){$('score').textContent=solved.size?`${solved.size}/3`:''}
+$('quizBox').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;const q=+b.dataset.q,i=+b.dataset.i;
+  if(i===ANS[q]){b.classList.remove('bad');b.classList.add('good');solved.add(q)}else{b.classList.add('bad');setTimeout(()=>b.classList.remove('bad'),700)}
+  score();
+});
+
+/* init */
+document.querySelectorAll('.lang button').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+renderIcons();
+setLang(['ar','fr','en'].includes(lang)?lang:'ar');
+resize();sync();requestAnimationFrame(loop);
+</script>
+</body>
+</html>
